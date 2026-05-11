@@ -1,0 +1,26 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const apiRoutes = require('./routes/api');
+const { sequelize, connection } = require('./config/database');
+
+const app = express();
+const port = process.env.PORT || 8080;
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/v1/api/', apiRoutes);
+
+(async () => {
+    try {
+        await connection();
+        await sequelize.sync();
+        app.listen(port, () => {
+            console.log(`Backend Nodejs App listening on port ${port}`);
+        });
+    } catch (error) {
+        console.log("Error connecting to DB: ", error);
+    }
+})();
